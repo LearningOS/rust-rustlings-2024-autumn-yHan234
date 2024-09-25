@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,13 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        let mut x = self.count;
+        while x > 1 && (self.comparator)(&self.items[x], &self.items[x / 2]) {
+            self.items.swap(x, x / 2);
+            x /= 2;
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +62,7 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        1
     }
 }
 
@@ -84,8 +88,34 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+
+        let mut x = 1;
+        while x * 2 <= self.count {
+            let mut c = x * 2; // c 为 x 两个孩子更小的一个
+            if c < self.count && (self.comparator)(&self.items[c + 1], &self.items[c]) {
+                c += 1;
+            }
+
+            // items 最后一个元素是否小于 c
+            // 若小于，那么最后一个元素可以代替 x 现在的位置，则退出循环
+            // 否则，最后一个元素不能代替 x 现在的位置，继续向下寻找
+            if (self.comparator)(&self.items[self.count], &self.items[x]) {
+                break;
+            } else {
+                self.items.swap(x, c);
+            }
+
+            x = c;
+        }
+
+
+        // x 为叶子节点，或者是最后一个元素小于 x 两个孩子
+        self.items.swap(x, self.count);
+        self.count -= 1;
+        self.items.pop()
     }
 }
 
